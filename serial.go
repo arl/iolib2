@@ -24,6 +24,9 @@ func (sp *serialPort) name() string {
 
 func (sp *serialPort) set(cfg cfgDict) error {
 	log.Debugf("serialPort.set(%v)", cfg)
+	if sp.port != nil {
+		return fmt.Errorf("serial port error, can't set an initialized port")
+	}
 
 	options, err := parseSerialPortOptions(cfg)
 	if err != nil {
