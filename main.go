@@ -28,6 +28,7 @@ func main() {
 	handler := newPortHandler()
 
 	handler.registerPort("file", newFilePort)
+	handler.registerPort("serial", newSerialPort)
 
 	port, err = strconv.Atoi(os.Args[1])
 	if err != nil {
