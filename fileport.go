@@ -36,7 +36,7 @@ func (fp *filePort) reset() error {
 }
 
 func (fp *filePort) write(buf []byte) error {
-	// create file or open if in order to append to it if it exists
+	// create file or open it in order to append to it if it exists
 	f, err := os.OpenFile(fp.fn, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
