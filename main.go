@@ -2,17 +2,19 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	zmq "github.com/pebbe/zmq4"
 )
 
 // from http://learning-0mq-with-pyzmq.readthedocs.io/en/latest/pyzmq/patterns/client_server.html
 
 func main() {
+	log.StandardLogger().SetLevel(log.DebugLevel)
+
 	if len(os.Args) != 2 {
 		log.Fatalln("Usage iolib2.exe PORTNUMBER")
 	}
@@ -23,7 +25,9 @@ func main() {
 		ctx  *zmq.Context
 		sck  *zmq.Socket
 	)
-	handler := portHandler{}
+	handler := newPortHandler()
+
+	handler.registerPort("file", newFilePort)
 
 	port, err = strconv.Atoi(os.Args[1])
 	if err != nil {
@@ -48,7 +52,7 @@ func main() {
 		// wait for next request from client
 		msg, err := sck.Recv(zmq.DONTWAIT)
 		if err == nil {
-			log.Println("received request \"%s\"", msg)
+			log.Printf("received request \"%s\"", msg)
 			err = handler.handleMessage(msg)
 			errString := newErrorString(err)
 			sck.Send(errString, zmq.DONTWAIT)
