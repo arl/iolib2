@@ -78,6 +78,7 @@ func (ph *portHandler) setPort(urlStr string) error {
 
 func (ph *portHandler) reset() error {
 	if ph.curPort != nil {
+		log.Info("reset current port, \"%v\"", ph.curPort.name())
 		return ph.curPort.reset()
 	}
 	// does nothing if port is not configured

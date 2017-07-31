@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
@@ -29,6 +31,7 @@ func main() {
 
 	handler.registerPort("file", newFilePort)
 	handler.registerPort("serial", newSerialPort)
+	handler.registerPort("net", newtcpPort)
 
 	port, err = strconv.Atoi(os.Args[1])
 	if err != nil {
@@ -49,17 +52,45 @@ func main() {
 		log.Fatalln("error binding socket,", err)
 	}
 
+	// wait for termination signals in a goroutine
+	sigs := make(chan os.Signal, 1)
+	done := make(chan bool, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		log.Info("waiting for requests or program termination")
+		sig := <-sigs
+		log.Infof("received %v signal", sig)
+		done <- true
+	}()
+
+	// main loop
 	for {
-		// wait for next request from client
-		msg, err := sck.Recv(zmq.DONTWAIT)
-		if err == nil {
-			log.Printf("received request \"%s\"", msg)
-			err = handler.handleMessage(msg)
-			errString := newErrorString(err)
-			sck.Send(errString, zmq.DONTWAIT)
+
+		select {
+
+		case <-done:
+			log.Info("cleaning up port")
+			handler.reset()
+			log.Info("closing reception socket")
+			sck.Close()
+			log.Info("terminating 0mq context")
+			ctx.Term()
+			log.Info("exiting")
+			return
+
+		default:
+			// wait for next request from client
+			msg, err := sck.Recv(zmq.DONTWAIT)
+			if err == nil {
+				log.Printf("received request \"%s\"", msg)
+				err = handler.handleMessage(msg)
+				errString := newErrorString(err)
+				sck.Send(errString, zmq.DONTWAIT)
+			}
+			time.Sleep(2 * time.Millisecond)
 		}
-		time.Sleep(2 * time.Millisecond)
 	}
+
 }
 
 func newErrorString(err error) string {
