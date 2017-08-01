@@ -31,7 +31,7 @@ func (ph *portHandler) handleMessage(msg string) error {
 	}
 	cmd, parm := cmdParm[0], cmdParm[1]
 
-	log.Printf("received %s with param %s", cmd, parm)
+	log.Debugf("received %s with param %s", cmd, parm)
 
 	switch cmd {
 	case "SET-PORT":
@@ -78,7 +78,7 @@ func (ph *portHandler) setPort(urlStr string) error {
 
 func (ph *portHandler) reset() error {
 	if ph.curPort != nil {
-		log.Info("reset current port, \"%v\"", ph.curPort.name())
+		log.Infof("reset current port, \"%v\"", ph.curPort.name())
 		return ph.curPort.reset()
 	}
 	// does nothing if port is not configured

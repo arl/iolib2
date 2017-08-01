@@ -21,12 +21,12 @@ func (fp *filePort) name() string {
 
 func (fp *filePort) set(cfg cfgDict) error {
 	log.Debugf("fileport.set(%v)", cfg)
-	if name, ok := cfg["name"]; !ok {
+	name, ok := cfg["name"]
+	if !ok {
 		return fmt.Errorf("fileport error: no name parameter")
-	} else {
-		fp.fn = name
-		log.Infof("fileport, set filename to %v", fp.fn)
 	}
+	fp.fn = name
+	log.Infof("fileport, set filename to %v", fp.fn)
 	return nil
 }
 

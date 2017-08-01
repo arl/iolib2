@@ -82,7 +82,7 @@ func main() {
 			// wait for next request from client
 			msg, err := sck.Recv(zmq.DONTWAIT)
 			if err == nil {
-				log.Printf("received request \"%s\"", msg)
+				log.Infof("received request \"%v\"", msg)
 				err = handler.handleMessage(msg)
 				errString := newErrorString(err)
 				sck.Send(errString, zmq.DONTWAIT)
