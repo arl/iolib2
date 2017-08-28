@@ -25,6 +25,9 @@ func (ph *portHandler) registerPort(name string, fn func() port) {
 }
 
 func (ph *portHandler) handleMessage(msg string) error {
+
+	//# TODO: continue here
+
 	cmdParm := strings.Split(msg, "|")
 	if len(cmdParm) != 2 {
 		return fmt.Errorf("malformed request, \"%s\"", msg)
@@ -43,7 +46,7 @@ func (ph *portHandler) handleMessage(msg string) error {
 	case "SEND":
 		return ph.send()
 	}
-	return fmt.Errorf("invalid command, \"%s\"", cmd)
+	return fmt.Errorf("unknown command, \"%s\"", cmd)
 }
 
 func (ph *portHandler) setPort(urlStr string) error {
