@@ -1,4 +1,4 @@
-package main
+package iolib2
 
 // the unique iolib2 error type
 type iolib2Error struct {

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/aurelien-rainone/iolib2/cmd/iolib2"
 	zmq "github.com/pebbe/zmq4"
 )
 
@@ -27,11 +28,11 @@ func main() {
 		ctx  *zmq.Context
 		sck  *zmq.Socket
 	)
-	handler := newPortHandler()
+	handler := iolib2.NewPortHandler()
 
-	handler.registerPort("file", newFilePort)
-	handler.registerPort("serial", newSerialPort)
-	handler.registerPort("net", newtcpPort)
+	handler.RegisterPort("file", iolib2.NewFilePort)
+	handler.RegisterPort("serial", iolib2.NewSerialPort)
+	handler.RegisterPort("net", iolib2.NewtcpPort)
 
 	port, err = strconv.Atoi(os.Args[1])
 	if err != nil {
@@ -70,7 +71,7 @@ func main() {
 
 		case <-done:
 			log.Info("cleaning up port")
-			handler.reset()
+			handler.Reset()
 			log.Info("closing reception socket")
 			sck.Close()
 			log.Info("terminating 0mq context")
@@ -83,7 +84,7 @@ func main() {
 			msg, err := sck.Recv(zmq.DONTWAIT)
 			if err == nil {
 				log.Infof("received request \"%v\"", msg)
-				err = handler.handleMessage(msg)
+				err = handler.HandleMessage(msg)
 				errString := newErrorString(err)
 				sck.Send(errString, zmq.DONTWAIT)
 			}

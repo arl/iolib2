@@ -1,4 +1,4 @@
-package main
+package iolib2
 
 import (
 	"fmt"
@@ -7,19 +7,19 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-type tcpPort struct {
+type TcpPort struct {
 	conn net.Conn
 }
 
-func newtcpPort() port {
-	return &tcpPort{}
+func NewtcpPort() Port {
+	return &TcpPort{}
 }
 
-func (sp *tcpPort) name() string {
+func (sp *TcpPort) Name() string {
 	return "net"
 }
 
-func (sp *tcpPort) set(cfg cfgDict) error {
+func (sp *TcpPort) Set(cfg cfgDict) error {
 	log.Debugf("tcpPort.set(%v)", cfg)
 	if sp.conn != nil {
 		return fmt.Errorf("tcp port, can't set an initialized port")
@@ -44,14 +44,14 @@ func (sp *tcpPort) set(cfg cfgDict) error {
 	return nil
 }
 
-func (sp *tcpPort) reset() error {
+func (sp *TcpPort) Reset() error {
 	if sp.conn != nil {
 		return sp.conn.Close()
 	}
 	return nil
 }
 
-func (sp *tcpPort) write(buf []byte) error {
+func (sp *TcpPort) Write(buf []byte) error {
 	if sp.conn != nil {
 		var ntot int
 		for {
@@ -68,7 +68,7 @@ func (sp *tcpPort) write(buf []byte) error {
 	return nil
 }
 
-func (sp *tcpPort) enumerate() ([]portEntry, error) {
+func (sp *TcpPort) Enumerate() ([]portEntry, error) {
 	// nothing to enumerate
 	return []portEntry{}, nil
 }

@@ -1,4 +1,4 @@
-package main
+package iolib2
 
 import (
 	"fmt"
@@ -7,19 +7,19 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-type filePort struct {
+type FilePort struct {
 	fn string // filename
 }
 
-func newFilePort() port {
-	return &filePort{}
+func NewFilePort() Port {
+	return &FilePort{}
 }
 
-func (fp *filePort) name() string {
+func (fp *FilePort) Name() string {
 	return "file"
 }
 
-func (fp *filePort) set(cfg cfgDict) error {
+func (fp *FilePort) Set(cfg cfgDict) error {
 	log.Debugf("fileport.set(%v)", cfg)
 	name, ok := cfg["name"]
 	if !ok {
@@ -30,12 +30,12 @@ func (fp *filePort) set(cfg cfgDict) error {
 	return nil
 }
 
-func (fp *filePort) reset() error {
+func (fp *FilePort) Reset() error {
 	// nothing to do
 	return nil
 }
 
-func (fp *filePort) write(buf []byte) error {
+func (fp *FilePort) Write(buf []byte) error {
 	// create file or open it in order to append to it if it exists
 	f, err := os.OpenFile(fp.fn, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
@@ -51,7 +51,7 @@ func (fp *filePort) write(buf []byte) error {
 	return nil
 }
 
-func (fp *filePort) enumerate() ([]portEntry, error) {
+func (fp *FilePort) Enumerate() ([]portEntry, error) {
 	// nothing to enumerate
 	return []portEntry{}, nil
 }

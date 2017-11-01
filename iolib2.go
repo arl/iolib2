@@ -1,4 +1,4 @@
-package main
+package iolib2
 
 import (
 	"bytes"
@@ -8,23 +8,23 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-type portHandler struct {
-	registry map[string]func() port // port registry
-	curPort  port                   // the current output port
+type PortHandler struct {
+	registry map[string]func() Port // port registry
+	curPort  Port                   // the current output port
 	buf      bytes.Buffer           // transmit buffer
 }
 
-func newPortHandler() *portHandler {
-	return &portHandler{
-		registry: map[string]func() port{},
+func NewPortHandler() *PortHandler {
+	return &PortHandler{
+		registry: map[string]func() Port{},
 	}
 }
 
-func (ph *portHandler) registerPort(name string, fn func() port) {
+func (ph *PortHandler) RegisterPort(name string, fn func() Port) {
 	ph.registry[name] = fn
 }
 
-func (ph *portHandler) handleMessage(msg string) error {
+func (ph *PortHandler) HandleMessage(msg string) error {
 
 	//# TODO: continue here
 
@@ -38,21 +38,21 @@ func (ph *portHandler) handleMessage(msg string) error {
 
 	switch cmd {
 	case "SET-PORT":
-		return ph.setPort(parm)
+		return ph.SetPort(parm)
 	case "RESET":
-		return ph.reset()
+		return ph.Reset()
 	case "WRITE":
-		return ph.write([]byte(parm))
+		return ph.Write([]byte(parm))
 	case "SEND":
-		return ph.send()
+		return ph.Send()
 	}
 	return fmt.Errorf("unknown command, \"%s\"", cmd)
 }
 
-func (ph *portHandler) setPort(urlStr string) error {
+func (ph *PortHandler) SetPort(urlStr string) error {
 	// check port is currently uninitialized
 	if ph.curPort != nil {
-		return fmt.Errorf("port has already initialized (curPort:%s)", ph.curPort.name())
+		return fmt.Errorf("port has already initialized (curPort:%s)", ph.curPort.Name())
 	}
 
 	// parse URL
@@ -76,19 +76,19 @@ func (ph *portHandler) setPort(urlStr string) error {
 
 	// create and initialize the port
 	ph.curPort = newPort()
-	return ph.curPort.set(cfgDict(m))
+	return ph.curPort.Set(cfgDict(m))
 }
 
-func (ph *portHandler) reset() error {
+func (ph *PortHandler) Reset() error {
 	if ph.curPort != nil {
-		log.Infof("reset current port, \"%v\"", ph.curPort.name())
-		return ph.curPort.reset()
+		log.Infof("reset current port, \"%v\"", ph.curPort.Name())
+		return ph.curPort.Reset()
 	}
 	// does nothing if port is not configured
 	return nil
 }
 
-func (ph *portHandler) write(buf []byte) error {
+func (ph *PortHandler) Write(buf []byte) error {
 	if ph.curPort != nil {
 		ph.buf.Write(buf)
 		return nil
@@ -96,9 +96,9 @@ func (ph *portHandler) write(buf []byte) error {
 	return fmt.Errorf("writing on a unintialized port")
 }
 
-func (ph *portHandler) send() error {
+func (ph *PortHandler) Send() error {
 	if ph.curPort != nil {
-		return ph.curPort.write(ph.buf.Bytes())
+		return ph.curPort.Write(ph.buf.Bytes())
 	}
 	return fmt.Errorf("sending to a unintialized port")
 }

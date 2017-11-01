@@ -1,4 +1,4 @@
-package main
+package iolib2
 
 import (
 	"fmt"
@@ -10,19 +10,19 @@ import (
 	"github.com/jacobsa/go-serial/serial"
 )
 
-type serialPort struct {
+type SerialPort struct {
 	port io.ReadWriteCloser
 }
 
-func newSerialPort() port {
-	return &serialPort{}
+func NewSerialPort() Port {
+	return &SerialPort{}
 }
 
-func (sp *serialPort) name() string {
+func (sp *SerialPort) Name() string {
 	return "serial"
 }
 
-func (sp *serialPort) set(cfg cfgDict) error {
+func (sp *SerialPort) Set(cfg cfgDict) error {
 	log.Debugf("serialPort.set(%v)", cfg)
 	if sp.port != nil {
 		return fmt.Errorf("serial port error, can't set an initialized port")
@@ -42,14 +42,14 @@ func (sp *serialPort) set(cfg cfgDict) error {
 	return nil
 }
 
-func (sp *serialPort) reset() error {
+func (sp *SerialPort) Reset() error {
 	if sp.port != nil {
 		sp.port.Close()
 	}
 	return nil
 }
 
-func (sp *serialPort) write(buf []byte) error {
+func (sp *SerialPort) Write(buf []byte) error {
 	if sp.port != nil {
 		_, err := sp.port.Write(buf)
 		if err != nil {
@@ -59,7 +59,7 @@ func (sp *serialPort) write(buf []byte) error {
 	return nil
 }
 
-func (sp *serialPort) enumerate() ([]portEntry, error) {
+func (sp *SerialPort) Enumerate() ([]portEntry, error) {
 	// nothing to enumerate
 	return []portEntry{}, nil
 }

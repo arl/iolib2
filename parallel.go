@@ -1,4 +1,4 @@
-package main
+package iolib2
 
 import (
 	"fmt"
@@ -7,19 +7,19 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-type parallelPort struct {
+type ParallelPort struct {
 	fn string // filename
 }
 
-func newFilePort() port {
-	return &parallelPort{}
+func NewParallelPort() Port {
+	return &ParallelPort{}
 }
 
-func (fp *parallelPort) name() string {
+func (fp *ParallelPort) Name() string {
 	return "parallel"
 }
 
-func (fp *parallelPort) set(cfg cfgDict) error {
+func (fp *ParallelPort) Set(cfg cfgDict) error {
 	panic("not implemented")
 	panic("to not have problems due to slow operations on port opening of the parallel port, we should, contatrily to the standard file port, keep the file pointer opened")
 
@@ -33,12 +33,12 @@ func (fp *parallelPort) set(cfg cfgDict) error {
 	return nil
 }
 
-func (fp *parallelPort) reset() error {
+func (fp *ParallelPort) Reset() error {
 	// nothing to do
 	return nil
 }
 
-func (fp *parallelPort) write(buf []byte) error {
+func (fp *ParallelPort) Write(buf []byte) error {
 	// create file or open it in order to append to it if it exists
 	f, err := os.OpenFile(fp.fn, os.O_RDWR, 0644)
 	if err != nil {
@@ -54,7 +54,7 @@ func (fp *parallelPort) write(buf []byte) error {
 	return nil
 }
 
-func (fp *parallelPort) enumerate() ([]portEntry, error) {
+func (fp *ParallelPort) Enumerate() ([]portEntry, error) {
 	// nothing to enumerate
 	return []portEntry{}, nil
 }

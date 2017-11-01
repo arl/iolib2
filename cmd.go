@@ -1,24 +1,24 @@
-package main
+package iolib2
 
 type cfgDict map[string]string
 
 // port is the interface implemented by various kinds of plotters.
-type port interface {
-	// set configures the writer with given configuration dict.
-	set(cfg cfgDict) error
+type Port interface {
+	// Set configures the writer with given configuration dict.
+	Set(cfg cfgDict) error
 
-	// reset closes the writer and performs eventual cleanup.
-	reset() error
+	// Reset closes the writer and performs eventual cleanup.
+	Reset() error
 
-	// write writes a buffer s to the writer.
-	write(buf []byte) error
+	// Write writes a buffer s to the writer.
+	Write(buf []byte) error
 
-	// enumerate enumerates the available ports of the machine and their
+	// Enumerate enumerates the available ports of the machine and their
 	// configuration string.
-	enumerate() ([]portEntry, error)
+	Enumerate() ([]portEntry, error)
 
-	// name returns the port name
-	name() string
+	// Name returns the port name
+	Name() string
 }
 
 // portEntry represents a port entry.
