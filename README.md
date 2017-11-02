@@ -1,7 +1,10 @@
 # Example of use:
 
 ## Python example client:
-- run: `pip install pyzmq`
+- cd `client`
+- run: `virtualenv -p $(which python2) .`
+- enable the virtualenv with `source ./bin/activate`
+- install python deps: `pip install -r requirements.txt`
 - Even if the daemon is not started yet, we can still use the client to send
   some text, that's not a problem thanks to the use of ZeroMQ :-D.
 - Let's choose the `file://` output and write to `/tmp/myfile`
