@@ -22,7 +22,7 @@ class IOLibError(IOError):
         return "iolib2 error({}), cfg={} : {}".format(self.errno, self.config, self.msg)
 
 
-class IOLib2Exe(object):
+class IOLib2Daemon(object):
     if not hasattr(sys, 'frozen'):
         exe_path = os.path.join(os.path.dirname(__file__), "iolib2.exe")
     else:
