@@ -5,41 +5,35 @@ import zmq
 import sys
 import argparse
 
+from iolib2 import IOLib2Com
 
-def connect_and_send(port, url, hpgl):
-    context = zmq.Context()
-    print "Connecting to server..."
-    socket = context.socket(zmq.REQ)
-    socket.connect("tcp://localhost:%s" % port)
+def connect_and_send(port, url, data):
+    iolib2_com = IOLib2Com(port)
+    print "Connecting to daemon..."
+    iolib2_com.connect()
 
-    cmds = [
-        "SET-PORT|{url}".format(**locals()),
-        "WRITE|{hpgl}\n".format(**locals()),
-        "SEND|",
-        "RESET|",
-    ]
+    ret = iolib2_com.set_port(url)
+    print('set_port ->', ret)
 
-    for cmd in cmds:
-        # request
-        print "Sending command ", cmd, "..."
-        ret = socket.send(cmd)
+    ret = iolib2_com.write(data)
+    print('write ->', ret)
 
-        # reply
-        msg = socket.recv()
-        print "Received reply ", cmd, "[", msg, "]"
-        ret_val, ret_str = msg.split("|")
-        if ret_val != '0':
-            print "Error, %v: %v".format(ret_val, ret_str)
-            break
+    ret = iolib2_com.send()
+    print('send ->', ret)
+
+    ret = iolib2_com.reset_port()
+    print('reset_port ->', ret)
+
+    iolib2_com.disconnect()
 
 
 def main():
     usage = """ {} -p PORT -u URL -f FILE
-Sends commands to plotter via iolib2.exe.
+Sends data to URL, via iolib2 daemon, listening on PORT
 
-With no FILE, read HPGL commands from standard input.
+With no FILE, read data from standard input.
 
-Some example plotter URL strings are:
+Some example URL strings are:
     - file://name=/tmp/file.hpgl
     - serial://port=/dev/pts/8;parms=9600,n,8,1
     - net://ip=localhost;port=9100
@@ -47,11 +41,11 @@ Some example plotter URL strings are:
 
     parser = argparse.ArgumentParser(usage=usage)
     parser.add_argument('-p', '--port', type=int, required=True,
-                        help='communicate with iolib2.exe on PORT')
+                        help='communicate with iolib2 daemon on PORT')
     parser.add_argument('-u', '--url', required=True,
-                        help='send commands to plotter at URL')
+                        help='send commands to device at URL')
     parser.add_argument('-f', '--file',
-                        help="read HPGL commands from FILE")
+                        help="read data FILE")
     args = parser.parse_args()
     if not args.file:
         hpgl = sys.stdin.readlines()
